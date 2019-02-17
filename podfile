@@ -1,0 +1,17 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'Hacker News' do
+  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for Hacker News
+  pod 'Alamofire', '~> 4.8.1'
+  pod 'SnapKit', '~> 4.0.0'
+
+  target 'Hacker NewsTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
