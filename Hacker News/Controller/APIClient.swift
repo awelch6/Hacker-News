@@ -50,7 +50,6 @@ public struct APIClient {
 
             Alamofire.request(URL(string: "\(urlString)/\(id).json")!, method: .get).responseJSON { (response) in
                 defer { group.leave() }
-                
                 if let error = response.error {
                     someError = error
                 } else if let data = response.data {

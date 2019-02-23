@@ -8,6 +8,7 @@ target 'Hacker News' do
   # Pods for Hacker News
   pod 'Alamofire', '~> 4.8.1'
   pod 'SnapKit', '~> 4.0.0'
+  pod 'lottie-ios'
 
   target 'Hacker NewsTests' do
     inherit! :search_paths
