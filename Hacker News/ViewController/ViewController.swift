@@ -10,6 +10,10 @@ import UIKit
 import SnapKit
 import WebKit
 
+protocol StoryDelegate: class {
+    func story(_ story: Story, wasSelected: Bool)
+}
+
 class ViewController: UIViewController {
     
     let searchController = UISearchController(searchResultsController: nil)
@@ -54,7 +58,6 @@ class ViewController: UIViewController {
         collectionView.addSubview(refreshControl)
         collectionView.alwaysBounceVertical = true
         collectionView.refreshControl = refreshControl
-        
         collectionView.backgroundColor = UIColor(red: 0.1235393509, green: 0.1286152303, blue: 0.1434211135, alpha: 1)
         
         navigationController?.navigationBar.barTintColor = UIColor(red: 0.9994125962, green: 0.4018217623, blue: 0, alpha: 1)
@@ -87,9 +90,7 @@ class ViewController: UIViewController {
 extension ViewController:  UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         print("Update.")
-    }
-    
-    
+    }    
 }
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -101,7 +102,8 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? StoryCollectionViewCell else { return UICollectionViewCell() }
         
-        cell.display(story: stories[indexPath.item])
+        cell.display(viewModel: StoryViewModel(story: stories[indexPath.item]))
+        cell.delegate = self
         
         return cell
     }
@@ -115,5 +117,13 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let articleViewController = ArticleViewController(story: stories[indexPath.item])
         self.navigationController?.pushViewController(articleViewController, animated: true)
+    }
+}
+
+extension ViewController: StoryDelegate {
+    func story(_ story: Story, wasSelected: Bool) {
+        let commentsViewController = CommentsViewController(story: story)
+        
+        self.navigationController?.pushViewController(commentsViewController, animated: true)
     }
 }

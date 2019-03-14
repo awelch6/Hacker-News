@@ -9,10 +9,10 @@
 import Foundation
 
 public struct Story: Codable {
-    let by: String
-    let descendants, id: Int
-    let kids: [Int]
-    let score, time: Int
-    let title, type: String
-    let url: String
+    public let by: String
+    public let descendants, id: Int
+    public let kids: [Int]
+    public let score, time: Int
+    public let title, type: String
+    public let url: String
 }

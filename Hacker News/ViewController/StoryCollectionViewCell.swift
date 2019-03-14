@@ -24,28 +24,13 @@ class StoryCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    let likeIcon = LOTAnimationView(name: "animation-w128-h128")
-    
-    let pointsLabel: UILabel = {
+    let storyInformationLabel: UILabel = {
         let label = UILabel()
         
         label.textColor = UIColor(red: 0.6509608626, green: 0.6733736396, blue: 0.7168717384, alpha: 1)
-        label.textAlignment = .center
+        label.textAlignment = .left
         label.font = UIFont(name: "Futura", size: 12)
         label.numberOfLines = 1
-        label.sizeToFit()
-        
-        return label
-    }()
-    
-    let authorLabel: UILabel = {
-        let label = UILabel()
-        
-        label.textColor = UIColor(red: 0.6509608626, green: 0.6733736396, blue: 0.7168717384, alpha: 1)
-        label.textAlignment = .center
-        label.font = UIFont(name: "Futura", size: 12)
-        label.numberOfLines = 1
-        label.isUserInteractionEnabled = true
         label.sizeToFit()
         
         return label
@@ -58,21 +43,22 @@ class StoryCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .center
         label.font = UIFont(name: "Futura", size: 12)
         label.numberOfLines = 1
-        label.isUserInteractionEnabled = true
         label.sizeToFit()
         
         return label
     }()
     
-    public var isLiked: Bool = false
+    
+    let commentButton = UIButton()
+    
+    private var story: Story?
+    
+    weak var delegate: StoryDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         configureView()
     }
-    
-    private var story: Story?
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -84,107 +70,63 @@ class StoryCollectionViewCell: UICollectionViewCell {
         layer.shadowOffset = CGSize(width: 1, height: 1)
     }
     
-    public func display(story: Story) {
-        self.story = story
-        
-        titleLabel.text = story.title
-        pointsLabel.text = "\(story.score) points"
-        authorLabel.text = "by: \(story.by)"
-        commentsLabel.text = "\(story.descendants) comments"
+    public func display(viewModel: StoryViewModel) {
+        self.story = viewModel.story        
+        titleLabel.text = viewModel.story.title
+        storyInformationLabel.text = viewModel.storyInformation
+        commentsLabel.text = viewModel.comments
     }
     
     private func configureView() {
         backgroundColor = UIColor(red: 0.2190627456, green: 0.2282821834, blue: 0.2461982667, alpha: 1)
         
-        setLikeIcon()
-        setTitle()
-        setAuthorLabel()
+        setCommentButton()
         setCommentsLabel()
-        setPointsLabel()
+        setTitle()
+        setStoryInformationLabel()
     }
     
-    private func setLikeIcon() {
-        addSubview(likeIcon)
-        likeIcon.snp.makeConstraints { (make) in
-            make.right.equalToSuperview().inset(10)
+    private func setCommentButton() {
+        addSubview(commentButton)
+        commentButton.snp.makeConstraints { (make) in
             make.centerY.equalToSuperview()
-            make.height.width.equalTo(55)
+            make.right.equalToSuperview().inset(15)
+            make.height.width.equalTo(25)
         }
-        likeIcon.loopAnimation = false
-        likeIcon.animationSpeed = 2.2
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(likeIconPressed(_:)))
-        likeIcon.addGestureRecognizer(tapGesture)
+        commentButton.setImage(UIImage(named: "chat-5"), for: .normal)
+        commentButton.addTarget(self, action: #selector(commentButtonPressed(_:)), for: .touchUpInside)
+    }
+    
+    private func setCommentsLabel() {
+        addSubview(commentsLabel)
+        commentsLabel.snp.makeConstraints { (make) in
+            make.centerX.equalTo(commentButton)
+            make.top.equalTo(commentButton.snp.bottom).inset(-5)
+        }
     }
     
     private func setTitle() {
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints { (make) in
             make.top.equalToSuperview().inset(5)
-            make.right.equalTo(likeIcon.snp.left)
+            make.right.equalTo(commentButton.snp.left)
             make.left.equalToSuperview().inset(15)
         }
     }
     
-    private func setAuthorLabel() {
-        addSubview(authorLabel)
-        authorLabel.snp.makeConstraints { (make) in
+    private func setStoryInformationLabel() {
+        addSubview(storyInformationLabel)
+        storyInformationLabel.snp.makeConstraints { (make) in
             make.left.equalToSuperview().inset(10)
             make.bottom.equalToSuperview().inset(5)
-        }
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(authorLabelTapped(_:)))
-        authorLabel.addGestureRecognizer(tapGesture)
-    }
-    
-    private func setCommentsLabel() {
-        addSubview(commentsLabel)
-        commentsLabel.snp.makeConstraints { (make) in
-            make.left.equalTo(authorLabel.snp.right).inset(-10)
-            make.bottom.equalToSuperview().inset(5)
-        }
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(commentLabelTapped(_:)))
-        commentsLabel.addGestureRecognizer(tapGesture)
-    }
-    
-    private func setPointsLabel() {
-        addSubview(pointsLabel)
-        pointsLabel.snp.makeConstraints { (make) in
-            make.centerX.equalTo(likeIcon)
-            make.top.equalTo(likeIcon.snp.bottom).inset(8)
+            make.right.equalTo(commentButton.snp.left).inset(10)
         }
     }
-    
-    @objc private func authorLabelTapped(_ gesture: UITapGestureRecognizer) {
-        print(authorLabel.text)
-    }
-    
-    @objc private func commentLabelTapped(_ gesture: UITapGestureRecognizer) {
-        print(commentsLabel.text)
-    }
-    @objc private func likeIconPressed(_ recognizer: UITapGestureRecognizer) {
-        if !isLiked {
-            likeIcon.play(toProgress: 0.5) { (_) in
-                self.pointsLabel.text = "\(self.story!.score + 1) points"
-            }
-        } else {
-            likeIcon.play(fromProgress: 0.5, toProgress: 1) { (_) in
-                self.pointsLabel.text = "\(self.story!.score) points"
-            }
-        }
-        isLiked = !isLiked
+
+    @objc private func commentButtonPressed(_ sender: UIButton) {
+        guard let story = self.story else { return }
+        delegate?.story( story, wasSelected: true)
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-}
-
-extension NSMutableAttributedString {
-    
-    public func setAsLink(textToFind: String, linkURL: String) -> Bool {
-        
-        let foundRange = self.mutableString.range(of: textToFind)
-        if foundRange.location != NSNotFound {
-            self.addAttribute(.link, value: linkURL, range: foundRange)
-            return true
-        }
-        return false
-    }
 }
