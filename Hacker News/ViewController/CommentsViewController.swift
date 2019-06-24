@@ -30,14 +30,9 @@ class CommentsViewController: UIViewController {
     
     private var story: Story {
         didSet {
-            APIClient.getComments(for: story) { (comment, error) in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else if let comment = comment {
-                    self.comments.append(comment)
-                    self.tableView.reloadData()
-                }
-                print(comment)
+            APIClient.getComments(for: story) { (comments) in
+                self.comments = comments
+                self.tableView.reloadData()
             }
         }
     }

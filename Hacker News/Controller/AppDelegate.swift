@@ -19,7 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let rootViewController = ViewController()
         
-        
         navigationController = UINavigationController(rootViewController: rootViewController)
         
         window = UIWindow(frame: UIScreen.main.bounds)

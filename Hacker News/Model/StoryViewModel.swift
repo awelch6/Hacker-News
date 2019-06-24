@@ -9,6 +9,7 @@
 import Foundation
 
 public struct StoryViewModel: Codable {
+    
     public let story: Story
     
     public var storyInformation: String {
